@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laborergebnisse</title>
+  
+  <!-- Roboto Mono von Google Fonts einbinden -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome für Navigation -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  
+  <!-- Shepherd CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/css/shepherd.css" />
+
+    <!-- Shepherd JS -->
+    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/js/shepherd.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      padding-bottom: 60px;
+    }
+
+    .content {
+      padding: 10px;
+      text-align: center;
+      padding-bottom: 50px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: normal;
+      margin-bottom: 20px;
+      color: #555;
+    }
+
+    .divider {
+      border: none;
+      border-top: 4px solid #ccc;
+      width: 100%;
+      margin: 0 auto 30px auto;
+    }
+    
+    .dividerSlim {
+      border: none;
+      border-top: 2px solid #ccc;
+      width: 100%;
+      margin: 0 auto 30px auto;
+    }
+    
+    .tile-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      max-width: 700px;
+      margin: 0 auto;
+      justify-items: center;
+    }
+
+    .tile {
+      position: relative;
+      background-color: #fafafa;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: background-color 0.3s;
+      height: 80px;
+      width: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .tile:hover {
+      background-color: #f1f1f1;
+    }
+
+    .tile .top-value,
+    .tile .bottom-value {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #666;
+    }
+
+    .tile .top-value {
+      top: 5px;
+    }
+
+    .tile .bottom-value {
+      bottom: 5px;
+    }
+
+    .tile .name {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .tile .value {
+      font-size: 20px;
+      margin-bottom: 3px;
+    }
+
+    .tile .unit {
+      font-size: 12px;
+      color: #777;
+    }
+
+    .info-box {
+      display: none;
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 400px;
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .info-box .close-btn {
+      float: right;
+      font-size: 40px;
+      font-weight: bold;
+      color: #666;
+      cursor: pointer;
+    }
+
+    .info-box .close-btn:hover {
+      color: #000;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+      z-index: 999;
+    }
+
+    nav {
+      background-color: #333;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 60px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+    }
+	
+    nav a {
+      display: flex;
+      flex-direction: column; /* Icon über Text */
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      transition: background-color 0.3s, color 0.3s;
+      flex-grow: 1;
+    }
+
+    nav a:hover {
+      background-color: #555;
+    }
+
+    nav a i {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+    
+    nav a span {
+      display: block;
+      font-size: 12px;
+    }
+
+    nav a.active {
+      background-color: #0066cc;
+      color: #fff;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+    }
+
+    .top-nav {
+      display: none;
+      position: sticky;
+      top: 0;
+      width: 100%;
+    }
+    
+    .tile-too-high {
+      background-color: #ffa483 !important;
+    }
+    .tile-too-high:hover {
+      background-color: #ee9d77 !important;
+    }
+
+    .tile-slightly-high {
+      background-color: #fdded9 !important;
+    }
+    .tile-slightly-high:hover {
+      background-color: #f6cec7 !important;
+    }
+
+    .tile-slightly-low {
+      background-color:  #ebd1f5 !important;
+    }
+    .tile-slightly-low:hover {
+      background-color: #debded !important;
+    }
+
+    .tile-too-low {
+      background-color: #c3a9f4 !important;
+    }
+    .tile-too-low:hover {
+      background-color: #a089cc !important;
+    }
+    
+    /* Für kleine Kacheln: genau drei Spalten */
+    .tile-grid.tile-small {
+      grid-template-columns: repeat(auto-fit, minmax(80px, 2fr));  /* oder: minmax(0, 1fr) für bessere Flexibilität */
+    }
+
+    /* Für mittlere Kacheln: genau zwei Spalten */
+    .tile-grid.tile-medium {
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    }
+
+    /* Für große Kacheln: genau zwei Spalten */
+    .tile-grid.tile-large {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+	
+    /*Einstellungen für kleine Tiles*/
+    .tile-grid.tile-small .tile {
+      height: 80px;
+      width: 80px;
+    }
+    .tile-grid.tile-small .tile .top-value,
+    .tile-grid.tile-small .tile .bottom-value {
+      font-size: 10px;
+    }
+    .tile-grid.tile-small .tile .top-value {
+      top: 4px;
+    }
+    .tile-grid.tile-small .tile .bottom-value {
+	  bottom: 4px;
+    }
+    .tile-grid.tile-small .tile .name {
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 3px;
+    }
+    .tile-grid.tile-small .tile .value {
+      font-size: 14px;
+      margin-bottom: 1px;
+    }
+    .tile-grid.tile-small .tile .unit {
+      font-size: 10px;
+      color: #777;
+    }
+	
+    /*Einstellungen für mittlere Tiles*/
+    .tile-grid.tile-medium .tile {
+      height: 110px;
+      width: 110px;
+    }
+    .tile-grid.tile-medium .tile .top-value,
+    .tile-grid.tile-medium .tile .bottom-value {
+      font-size: 12px;
+    }
+    .tile-grid.tile-medium .tile .top-value {
+      top: 4px;
+    }
+    .tile-grid.tile-medium .bottom-value {
+	  bottom: 4px;
+    }
+    .tile-grid.tile-medium .tile .name {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .tile-grid.tile-medium .tile .value {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+    .tile-grid.tile-medium .unit {
+      font-size: 12px;
+      color: #777;
+    }
+    
+	/*Einstellungen für größe Tiles*/
+    .tile-grid.tile-large .tile {
+      height: 220px;
+      width: 220px;
+    }
+    .tile-grid.tile-large .tile .top-value,
+    .tile-grid.tile-large .tile .bottom-value {
+      font-size: 20px;
+    }
+    .tile-grid.tile-large .tile .top-value {
+      top: 4px;
+    }
+    .tile-grid.tile-large .bottom-value {
+	  bottom: 4px;
+    }
+    .tile-grid.tile-large .tile .name {
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .tile-grid.tile-large .tile .value {
+      font-size: 30px;
+      margin-bottom: 4px;
+    }
+    .tile-grid.tile-large .unit {
+      font-size: 20px;
+      color: #777;
+    }
+
+   
+    .zoom-controls {
+  		margin-bottom: 20px;
+	}
+   
+
+	.zoom-controls button {
+      margin: 0 5px;
+      padding: 6px 12px;
+      font-size: 14px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .zoom-controls button:hover {
+      background-color: #004999;
+    }
+    
+     .zoom-controls button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      color: #666;
+      box-shadow: 0 5px 15px rgba(0,0,0,0);
+    }
+    .filter-controls button {
+      margin: 0 5px;
+      padding: 6px 12px;
+      font-size: 14px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .filter-controls button:hover {
+      background-color: #004999;
+    }
+
+    /* Hilfe-Button oben rechts */
+    #startTourBtn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 22px;
+      width: 42px;
+      height: 42px;
+      cursor: pointer;
+      z-index: 9999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      /* Standard: oben rechts (mobile Ansicht) */
+      top: 10px;
+      right: 10px;
+    }
+    #startTourBtn:hover {
+      background-color: #004999;
+    }
+    
+    
+    
+    .value-bar-container {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 0px;
+  margin: 40px auto;
+  max-width: 800px;
+  width: 90%;
+  position: relative;
+}
+
+.bar {
+  background-color: #eee;
+  height: 60px;
+  width: 100%;
+  position: relative;
+  border-radius: 0px;
+  overflow: hidden;
+}
+
+.bar-label {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: bold;
+  font-size: 12px;
+  color: #333;
+}
+
+.dot {
+  position: absolute;
+  bottom: 50%;
+  width: 12px;
+  height: 12px;
+  background-color: #0066cc;
+  border-radius: 50%;
+  transform: translateY(50%);
+}
+
+#too-high {
+  background-color: #ffbd9f; /* Rot */
+}
+
+#slightly-high {
+  background-color: #fdded9; /* Orange */
+}
+
+#normal {
+  background-color: #fafafa; /* Grau */
+}
+
+#slightly-low {
+  background-color: #ebd1f5; /* hell-Lila */
+}
+
+#too-low {
+  background-color: #c3a9f4; /* Violett */
+}
+
+
+.bar-label {
+  color: #fff; /* Weißer Text für Kontrast */
+  font-weight: bold;
+  text-shadow: 0 0 3px rgba(0,0,0,0.3); /* leichte Lesbarkeit */
+}
+
+.dot:hover {
+  background-color: #004891;
+}
+
+.dot:hover::after {
+  content: attr(data-name);
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 4px 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  border-radius: 5px;
+  pointer-events: none;
+  opacity: 0.9;
+  z-index: 10;
+}
+
+.dot:focus,
+.dot.selected {
+  outline: 2px solid black;
+  box-shadow: 0 0 5px rgba(0,0,0,0.4);
+}
+
+.dot.highlight {
+  background-color: orange !important;
+  transform: scale(1.4) translateY(50%);
+  z-index: 20;
+}
+
+.tile.dot-highlight {
+  outline: 3px solid orange;
+  outline-offset: 2px;
+  z-index: 2;
+}
+
+.main-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.tile-section,
+.bar-section {
+  width: 100%;
+}
+
+ @media screen and (min-width: 768px)  {
+    
+      .top-nav {
+        display: flex;
+      }
+      
+      .bottom-nav {
+        display: none;
+      }
+
+      body {
+        padding-bottom: 0;
+      }
+
+      .content {
+        padding-top: 40px;
+      }
+
+      nav a {
+        flex-direction: row; /* Icon links vom Text */
+        justify-content: center;
+        font-size: 16px;
+      }
+
+      nav a i {
+        font-size: 20px;
+        margin-bottom: 0;
+        margin-right: 8px;
+        display: inline-block;
+      }
+
+      nav a span {
+        display: inline;
+      }
+      
+      #startTourBtn {
+        top: auto;
+        bottom: 20px;
+        right: 20px;
+      }
+      
+    }
+
+@media screen and (min-width: 992px) {
+
+
+  .main-grid {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .bar-section {
+    flex: 0 0 300px;
+    max-width: 500px;
+    padding-right: 20px;
+    
+  }
+
+  .tile-section {
+    flex: 1;
+  }
+
+  /* Optional: kleinere Balken bei nebeneinander-Anordnung */
+  .value-bar-container {
+    width: 100%;
+    max-width: none;
+  }
+
+  .legend {
+    text-align: left;
+    padding-left: 10px;
+  }
+
+  #info-output {
+    text-align: left;
+    padding-left: 10px;
+  }
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Desktop -->
+  <nav class="top-nav">
+   	<a href="mydata.html"><i class="fas fa-user"></i> <span>Person</span></a>
+    <a href="overview.html" class="active"><i class="fa-solid fa-flask"></i> <span>Übersicht</span></a>
+    <a href="timeline.html"><i class="fas fa-clock"></i> <span>Zeitverlauf</span></a>
+   
+  </nav>
+
+  <!-- Inhalt -->
+  <div class="content">
+  <!-- Hilfe-Button -->
+    <button id="startTourBtn" title="Erklärungstour starten">
+      <i class="fas fa-question-circle"></i>
+    </button>
+    <h1>Laborergebnisse</h1>
+    <h2>Max Mustermann</h2>
+    
+  <!-- Zoombutton ID-Zuweisung -->
+  <div class="zoom-controls">
+    <button id="zoomOutBtn" onclick="zoomOut()"><i class="fa-solid fa-magnifying-glass-minus"></i> Kleiner</button>
+    <button id="zoomInBtn" onclick="zoomIn()"><i class="fa-solid fa-magnifying-glass-plus"></i> Größer</button>
+  </div>
+  <div class="filter-controls" style="margin-bottom: 10px;">
+    
+    <hr class="divider" />
+    
+  <button id="toggleNormalBtn" onclick="toggleNormalTiles()">Normalwerte ausblenden</button>
+  </div>
+    
+    <!-- Großer Hauptkontainer um Übersicht und Kacheln zu trennen -->
+    <div class="main-grid">
+    	<!-- Übersicht -->
+  		<div class="bar-section">
+  			<h2>Werteverteilung</h2>
+            	<!-- Balken -->
+      			<div class="value-bar-container">
+                    <div class="bar" id="too-low"><span class="bar-label">Stark zu niedrig</span></div>
+                    <div class="bar" id="slightly-low"><span class="bar-label">Leicht vermindert</span></div>
+                    <div class="bar" id="normal"><span class="bar-label">Normalbereich</span></div>
+                    <div class="bar" id="slightly-high"><span class="bar-label">Leicht erhöht</span></div>
+                    <div class="bar" id="too-high"><span class="bar-label">Stark zu hoch</span></div>
+        		</div>
+                
+                <!-- Output unter Ansicht, welcher Wert aktuell angeklickt ist -->
+        		<div id="info-output" style="text-align:center; font-size:14px; margin-top:15px; min-height:20px; color:#333;"></div>
+
+				<!-- Legende zu den Farben -->
+                <div class="legend" style="margin-top: 20px; font-size: 13px;">
+                  <span style="color: #ffbeb8;">●</span> Stark zu hoch &
+                  <span style="color: #ffe1cd;">●</span> Leicht erhöht &
+                  <span style="color: #f1f1f1;">●</span> Normal &
+                  <span style="color: #e9d6e9;">●</span> Leicht vermindert &
+                  <span style="color: #cab3cc;">●</span> Stark zu niedrig
+                </div>
+                <br/>
+				<hr class="divider" />
+		</div>
+        
+  		<div class="tile-section">
+  			<h2>kleines Blutbild</h2>
+       			<div class="tile-grid">
+                	<!-- Beispielhafte 9 Kacheln -->       
+                    <div class="tile" onclick="openInfoBox('Erythrozyten')">
+                      <div class="top-value">5,8</div>
+                      <div class="name">Erythrozyten</div>
+                      <div class="value">4,0</div>
+                      <div class="unit">TPt/l</div>
+                      <div class="bottom-value">4,3</div>
+                    </div>
+                    <div class="tile" onclick="openInfoBox('Hämoglobin')">
+                      <div class="top-value">10,7</div>
+                      <div class="name">Hämoglobin</div>
+                      <div class="value">10,9</div>
+                      <div class="unit">mmol/L</div>
+                      <div class="bottom-value">8,4</div>
+                    </div>
+                    <div class="tile" onclick="openInfoBox('Hämatokrit')">
+                      <div class="top-value">0,51</div>
+                      <div class="name">Hämatokrit</div>
+                      <div class="value">0,53</div>
+                      <div class="unit">l/l</div>
+                      <div class="bottom-value">0,40</div>
+                    </div>
+                    <div class="tile" onclick="openInfoBox('MCV')">
+                      <div class="top-value">99,0</div>
+                      <div class="name">MCV</div>
+                      <div class="value">79,5</div>
+                      <div class="unit">fl</div>
+                      <div class="bottom-value">80,0</div>
+                    </div>
+                    <div class="tile" onclick="openInfoBox('MCH')">
+                      <div class="top-value">2,08</div>
+                      <div class="name">MCH</div>
+                      <div class="value">1,98</div>
+                      <div class="unit">fmol</div>
+                      <div class="bottom-value">1,68</div>
+                    </div>
+                    <div class="tile" onclick="openInfoBox('MCHC')">
+                      <div class="top-value">22,4</div>
+                      <div class="name">MCHC</div>
+                      <div class="value">21,3</div>
+                      <div class="unit">mmol/l</div>
+                      <div class="bottom-value">19,6</div>
+                    </div>
+                    <div class="tile" onclick="openInfoBox('Leukozyten')">
+                      <div class="top-value">10,2</div>
+                      <div class="name">Leukozyten</div>
+                      <div class="value">8,5</div>
+                      <div class="unit">GPt/l</div>
+                      <div class="bottom-value">3,9</div>
+                    </div>
+                    <div class="tile" onclick="openInfoBox('Thrombozyten')">
+                      <div class="top-value">370</div>
+                      <div class="name">Thrombozyten</div>
+                      <div class="value">80</div>
+                      <div class="unit">GPt/l</div>
+                      <div class="bottom-value">150</div>
+                    </div>
+      			</div>
+                
+                <br>
+                <hr class="dividerSlim" />
+                
+             <h2>großes Blutbild</h2>
+       			<div class="tile-grid">
+                	<!-- Beispielhafte 9 Kacheln -->       
+                    <div class="tile" onclick="openInfoBox('Segmentkernige')">
+                      <div class="top-value">70</div>
+                      <div class="name">Segmentkernige</div>
+                      <div class="value">66</div>
+                      <div class="unit">%</div>
+                      <div class="bottom-value">40</div>
+                    </div>
+                    <div class="tile" onclick="openInfoBox('Stabkernige')">
+                      <div class="top-value">10</div>
+                      <div class="name">Stabkernige</div>
+                      <div class="value">2</div>
+                      <div class="unit">%</div>
+                      <div class="bottom-value">0</div>
+                    </div>
+                    <div class="tile" onclick="openInfoBox('Lymphozyten')">
+                      <div class="top-value">44</div>
+                      <div class="name">Lymphozyten</div>
+                      <div class="value">19</div>
+                      <div class="unit">%</div>
+                      <div class="bottom-value">20</div>
+                    </div>
+                    <div class="tile" onclick="openInfoBox('Monozyten')">
+                      <div class="top-value">10</div>
+                      <div class="name">Monozyten</div>
+                      <div class="value">11</div>
+                      <div class="unit">%</div>
+                      <div class="bottom-value">0</div>
+                    </div>
+                    <div class="tile" onclick="openInfoBox('Eosinophile')">
+                      <div class="top-value">5</div>
+                      <div class="name">Eosinophile</div>
+                      <div class="value">1</div>
+                      <div class="unit">%</div>
+                      <div class="bottom-value">0</div>
+                    </div>
+                    <div class="tile" onclick="openInfoBox('Basophile')">
+                      <div class="top-value">2</div>
+                      <div class="name">Basophile</div>
+                      <div class="value">1</div>
+                      <div class="unit">%</div>
+                      <div class="bottom-value">0</div>
+                    </div>
+                    <div class="tile" onclick="openInfoBox('Blutsenkung')">
+                      <div class="top-value">20</div>
+                      <div class="name">Blutsenkung</div>
+                      <div class="value">10</div>
+                      <div class="unit">mm</div>
+                      <div class="bottom-value">0</div>
+                    </div>
+      			</div>
+		</div>
+	</div>
+</div>
+
+  <!-- Navigation Mobile -->
+  <nav class="bottom-nav">
+  	<a href="mydata.html"><i class="fas fa-user"></i><span>Person</span></a>
+    <a href="overview.html" class="active"><i class="fa-solid fa-flask"></i><span>Übersicht</span></a>
+    <a href="timeline.html"><i class="fas fa-clock"></i><span>Zeitverlauf</span></a>
+  </nav>
+
+  <!-- Info Box -->
+  <div class="overlay" id="overlay" onclick="closeInfoBox()"></div>
+  <div class="info-box" id="infoBox">
+    <span class="close-btn" onclick="closeInfoBox()">×</span>
+    <h3 id="infoTitle">Zusatzinformationen</h3>
+    <p id="infoText">Details zur Messung erscheinen hier.</p>
+  </div>
+  
+  
+
+  <!-- Script -->
+  <script>
+  
+  const infoTexts = {
+      "Erythrozyten": "Erythrozyten, auch rote Blutkörperchen genannt, sind scheibenförmige Zellen, die für den Sauerstofftransport und den CO2-Abtransport zuständig sind. Sie bestehen größtenteils aus Hämoglobin und geben Hinweise darauf, wie gut der Körper mit Sauerstoff versorgt ist.",
+      
+      "Hämoglobin": "Hämoglobin ist das eisenhaltige Eiweißmolekül, das sich in den Erythrozyten – auch rote Blutkörperchen genannt – befindet. Neben dem Sauerstoff- und Kohlendioxidtransport im Blutkreislauf ist das im Hämoglobin enthaltene Eisen zudem für die rote Farbe des Blutes verantwortlich.",
+      
+      "Hämatokrit": "Hämatokrit gibt an, wie viel Prozent des Vollblutes aus festen Blutzellen besteht. Damit gibt dieser Wert Aufschluss über die Fließfähigkeit des Blutes.",
+      
+      "MCV": "Das mittlere korpuskuläre Volumen der Erythrozyten bezeichnet man als MCV (mean copuscular volume). Hierbei handelt es sich um einen absoluten Wert im Femtoliter-Bereich, der die durchschnittliche Größe der roten Blutkörperchen beschreibt. Er kann bei Aussagen zu den Ursachen von Anämien (Blutarmut) hinweisend sein.",
+      
+      "MCH": "Die Abkürzung MCH beschreibt das mittlere korpuskuläre Hämoglobin (mean corpuscular hemoglobin), also wie viel Hämoglobin pro Erythrozyt vorliegt oder anders gesagt: wie stark die roten Blutkörperchen mit ihrem Farbstoff beladen sind. Ist es vermindert spricht, man von hypochromen, erhöht von hyperchromen Zellen.",
+      
+      "MCHC": "MCHC steht für “mean corpuscular haemoglobin concentration” und beschreibt die durchschnittliche Hämoglobin-Konzentration aller Erythrozyten. Der MCHC-Wert wird im Rahmen eines Blutbildes nicht direkt gemessen, sondern aus anderen Werten berechnet. Er ergibt sich au s Hämoglobin geteilt durch Hämatokrit.",
+      
+      "Leukozyten": "Leukozyten bzw. weiße Blutkörperchen werden im Knochenmark hergestellt und finden sich im Blut sowie im Gewebe, in den Lymphknoten und den Schleimhäuten. Ihre Aufgabe ist die Unterstützung des Immunsystems, indem sie helfen Infektionen und andere Krankheiten zu bekämpfen und abzuwehren.",
+      
+      "Thrombozyten": "Thrombozyten werden auch als Blutplättchen bezeichnet und sind Zellfragmente, die im Blut zirkulieren. Sie sind sehr nützlich bei Verletzungen und haften sich an die Wunde oder den Wänden beschädigter Gefäßen an, um sie zu schließen und das Blut zu stillen. Allerdings können sie auch an der Bildung von gefährlichen Blutgerinnseln beteiligt sein.",
+      
+      "Segmentkernige": "Die Form des Zellkerns der neutrophilen Granulozyten lässt Rückschlüsse auf das Alter zu: junge Zellen sind stabförmig, ältere hingegen segmentkernig. Ihre Aufgabe besteht darin, Erreger mittels Phagozytose zu bekämpfen. Hierzu können sie auch Stoffe wie Enzyme abgeben und so Erreger gezielt abtöten.",
+      
+      "Stabkernige": "Die Form des Zellkerns der neutrophilen Granulozyten lässt Rückschlüsse auf das Alter zu: junge Zellen sind stabförmig, ältere hingegen segmentkernig. Ihre Aufgabe besteht darin, Erreger mittels Phagozytose zu bekämpfen. Hierzu können sie auch Stoffe wie Enzyme abgeben und so Erreger gezielt abtöten.",
+      
+      "Lymphozyten": "Lymphozyten gehören zu den weißen Blutkörperchen (Leukozyten). Ihre zentrale Aufgabe ist es, als wichtiger Teil des Immunsystems Krankheitserreger abzuwehren und unschädlich zu machen. Gebildet werden sie in den lymphatischen Organen, wozu u.a. die Milz, der Thymus und das Knochenmark zählen.",
+      
+      "Monozyten": "Monozyten gehören zur Gruppe der weißen Blutkörperchen (Leukozyten) und geben Hinweise auf den Abwehrstatus des Körpers: Im Zuge akuter Infektionen können die Monozyten Werte im Blut erhöht sein. Bei Monozyten handelt sich um die größten Zellen des Blutes, die als Fresszellen eine wichtige Rolle bei der Immunabwehr spielen.",
+      
+      "Eosinophile": "Eosinophile Granulozyten machen einen verhältnismäßig kleinen Anteil im Blut aus. Bei der Färbung weist ihr Kern eine rötliche Granula auf, sie lassen sich sehr gut mit Eosin anfärben. Auch sie sind unmittelbar an der Abwehr bei Infektionen beteiligt, indem sie unter anderem spezielle Enzyme absondern.",
+      
+      "Basophile": "Basophile Granulozyten sind die kleinsten und zahlenmäßig geringsten Granulozyten. Unter dem Mikroskop erscheinen sie nach der Färbung violett. Sie spielen vor allem bei Allergien und Entzündungsreaktionen eine Rolle. Im Zellkern befinden sich Heparin und Histamin.",
+      
+      "Blutsenkung": "Blutsenkung ist ein einfacher Test, der angibt, wie schnell die roten Blutkörperchen in einer Blutprobe innerhalb einer Stunde in einem speziellen Röhrchen absinken. Der Test wird zur Erkennung von Entzündungen im Zusammenhang mit Infektionen, Krebserkrankungen und Autoimmunkrankheiten eingesetzt."
+    };
+  
+  // Hilfsfunktion zur Escape-konformen Nutzung in Klassen
+    function escapeCss(name) {
+      return name.replace(/[^a-zA-Z0-9_-]/g, '_');
+    }
+  
+    function openInfoBox(name) {
+      document.getElementById('infoBox').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+      document.getElementById('infoTitle').innerText = name;
+
+      const infoText = infoTexts[name] || "Zu diesem Wert sind derzeit keine weiteren Informationen verfügbar.";
+      document.getElementById('infoText').innerText = infoText;
+    }
+
+    function closeInfoBox() {
+      document.getElementById('infoBox').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    }
+    
+    let zoomLevels = ['tile-small', 'tile-medium', 'tile-large'];
+    let currentZoomIndex = 1; // Start bei medium
+
+    function applyZoom() {
+      const grids = document.querySelectorAll('.tile-grid');
+      grids.forEach(grid => {
+        grid.classList.remove(...zoomLevels);
+        grid.classList.add(zoomLevels[currentZoomIndex]);
+      });
+      updateZoomButtons();
+    }
+
+
+    function zoomIn() {
+      if (currentZoomIndex < zoomLevels.length - 1) {
+        currentZoomIndex++;
+        applyZoom();
+      }
+    }
+
+    function zoomOut() {
+      if (currentZoomIndex > 0) {
+        currentZoomIndex--;
+        applyZoom();
+      }
+    }
+
+    function updateZoomButtons() {
+      const zoomOutBtn = document.getElementById('zoomOutBtn');
+      const zoomInBtn = document.getElementById('zoomInBtn');
+
+      zoomOutBtn.disabled = currentZoomIndex === 0;
+      zoomInBtn.disabled = currentZoomIndex === zoomLevels.length - 1;
+      
+        // Zoom Out: deaktivieren & Tooltip setzen
+      if (currentZoomIndex === 0) {
+        zoomOutBtn.disabled = true;
+        zoomOutBtn.title = "Minimaler Zoom erreicht";
+      } else {
+        zoomOutBtn.disabled = false;
+        zoomOutBtn.title = "Kleiner anzeigen";
+      }
+
+      // Zoom In: deaktivieren & Tooltip setzen
+      if (currentZoomIndex === zoomLevels.length - 1) {
+        zoomInBtn.disabled = true;
+        zoomInBtn.title = "Maximaler Zoom erreicht";
+      } else {
+        zoomInBtn.disabled = false;
+        zoomInBtn.title = "Größer anzeigen";
+      }
+    }
+    
+    function evaluateTileValues() {
+      const tiles = document.querySelectorAll('.tile');
+
+      tiles.forEach(tile => {
+        const top = parseFloat(tile.querySelector('.top-value')?.innerText.replace(',', '.'));
+        const value = parseFloat(tile.querySelector('.value')?.innerText.replace(',', '.'));
+        const bottom = parseFloat(tile.querySelector('.bottom-value')?.innerText.replace(',', '.'));
+
+       // Entfernt alle Klassifizierungen (vor dem Neuzeichnen bei Zoom o.ä.)
+          tile.classList.remove(
+            'tile-too-high',
+            'tile-slightly-high',
+            'tile-slightly-low',
+            'tile-too-low'
+          );
+      });
+    }
+
+    // Initial anwenden
+    applyZoom();
+    evaluateTileValues();
+
+    // Navigation aktiv setzen
+    const navLinks = document.querySelectorAll('.top-nav a, .bottom-nav a');
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.forEach(el => el.classList.remove('active'));
+        link.classList.add('active');
+      });
+    });
+    
+    
+function plotValuesInBars() {
+  const bars = {
+    "too-high": document.getElementById("too-high"),
+    "slightly-high": document.getElementById("slightly-high"),
+    "normal": document.getElementById("normal"),
+    "slightly-low": document.getElementById("slightly-low"),
+    "too-low": document.getElementById("too-low")
+  };
+
+  // Punkte pro Kategorie sammeln
+  const groups = {
+    "too-high": [],
+    "slightly-high": [],
+    "normal": [],
+    "slightly-low": [],
+    "too-low": []
+  };
+
+  const tiles = document.querySelectorAll(".tile");
+
+  tiles.forEach(tile => {
+    const name = tile.querySelector(".name")?.innerText.trim() || "Unbenannt";
+    const top = parseFloat(tile.querySelector(".top-value")?.innerText.replace(",", "."));
+    const val = parseFloat(tile.querySelector(".value")?.innerText.replace(",", "."));
+    const bottom = parseFloat(tile.querySelector(".bottom-value")?.innerText.replace(",", "."));
+
+    // Überspringe ausgeblendete Kacheln
+    if (tile.style.display === "none") return;
+
+    if (!isNaN(val) && !isNaN(top) && !isNaN(bottom)) {
+      const margin = 0.2 * (top - bottom);
+      let target = "";
+
+      if (val > top + margin) {
+        target = "too-high";
+      } else if (val > top) {
+        target = "slightly-high";
+      } else if (val >= bottom && val <= top) {
+        target = "normal";
+      } else if (val >= bottom - margin && val < bottom) {
+        target = "slightly-low";
+      } else {
+        target = "too-low";
+      }
+
+      groups[target].push(name);
+
+      // Kachel passend einfärben
+      const escapedName = escapeCss(name);
+      const tile = Array.from(document.querySelectorAll(".tile")).find(t => {
+        const tileName = t.querySelector(".name")?.innerText.trim();
+        return escapeCss(tileName) === escapedName;
+      });
+
+      if (tile) {
+        tile.classList.remove(
+          'tile-too-high',
+          'tile-slightly-high',
+          'tile-slightly-low',
+          'tile-too-low'
+        );
+
+        // Nur einfärben, wenn NICHT normal
+        if (target !== "normal") {
+          tile.classList.add(`tile-${target}`);
+        }
+      }
+    }
+  });
+
+  // Balken-Inhalte zurücksetzen
+  Object.keys(bars).forEach(key => {
+    let label = bars[key].querySelector('.bar-label')?.outerHTML || '';
+    bars[key].innerHTML = label;
+  });
+
+  // Jetzt Punkte verteilen
+  Object.entries(groups).forEach(([group, names]) => {
+    const container = bars[group];
+    const total = names.length;
+
+    names.forEach((name, index) => {
+      const dot = document.createElement("div");
+      dot.classList.add("dot");
+
+      // gleichmäßige Verteilung: (index + 1) / (total + 1)
+      const left = ((index + 1) / (total + 1)) * 100;
+      dot.style.left = `${left}%`;
+
+      dot.setAttribute("data-name", name);
+      dot.dataset.tileName = name;
+      dot.classList.add(`dot-${escapeCss(name)}`);
+
+      // Klickanzeige
+      dot.addEventListener("click", () => {
+  const infoBox = document.getElementById("info-output");
+  infoBox.innerText = `Ausgewählter Messwert: ${name}`;
+});
+dot.addEventListener("click", () => {
+  document.querySelectorAll(".dot").forEach(d => d.classList.remove("selected"));
+  dot.classList.add("selected");
+  infoOutput.innerText = `Ausgewählter Messwert: ${name}`;
+});
+      container.appendChild(dot);
+    });
+  });
+  
+addHoverEffectToTiles(); // bereits enthalten, für tile → dot
+
+  // NEU: dot → tile
+  const dots = document.querySelectorAll(".dot");
+  dots.forEach(dot => {
+    const tileName = dot.dataset.tileName;
+    const tileClass = escapeCss(tileName);
+
+    dot.addEventListener("mouseenter", () => {
+      document.querySelectorAll(".tile").forEach(tile => {
+        const name = tile.querySelector(".name")?.innerText.trim();
+        if (escapeCss(name) === tileClass) {
+          tile.classList.add("dot-highlight");
+        }
+      });
+    });
+
+    dot.addEventListener("mouseleave", () => {
+      document.querySelectorAll(".tile").forEach(tile => {
+        tile.classList.remove("dot-highlight");
+      });
+    });
+  });
+
+}
+
+  plotValuesInBars();
+  
+  let hideNormalValues = false;
+
+function toggleNormalTiles() {
+  hideNormalValues = !hideNormalValues;
+  const button = document.getElementById("toggleNormalBtn");
+  const tiles = document.querySelectorAll('.tile');
+
+  const hiddenNames = []; // Für Dots mitzeichnen
+
+  tiles.forEach(tile => {
+    const name = tile.querySelector(".name")?.innerText.trim();
+    const topVal = parseFloat(tile.querySelector(".top-value")?.innerText.replace(",", "."));
+    const midVal = parseFloat(tile.querySelector(".value")?.innerText.replace(",", "."));
+    const bottomVal = parseFloat(tile.querySelector(".bottom-value")?.innerText.replace(",", "."));
+
+    if (!isNaN(topVal) && !isNaN(midVal) && !isNaN(bottomVal)) {
+      const isNormal = midVal >= bottomVal && midVal <= topVal;
+
+      if (hideNormalValues && isNormal) {
+        tile.style.display = "none";
+        hiddenNames.push(name);
+      } else {
+        tile.style.display = "";
+      }
+    }
+   plotValuesInBars(); 
+  });
+
+  // Dots entsprechend verstecken
+  const dots = document.querySelectorAll(".dot");
+  dots.forEach(dot => {
+    const id = dot.dataset.tileName;
+    if (hideNormalValues && hiddenNames.includes(id)) {
+      dot.style.display = "none";
+    } else {
+      dot.style.display = ""; // wieder einblenden
+    }
+  });
+
+  button.innerText = hideNormalValues
+    ? "Normalwerte einblenden"
+    : "Normalwerte ausblenden";
+}
+
+// Heben den zugehörigen Punkt hervor, wenn über die Kachel gehovert wird
+function addHoverEffectToTiles() {
+  const tiles = document.querySelectorAll(".tile");
+
+  tiles.forEach(tile => {
+    const name = tile.querySelector(".name")?.innerText.trim();
+    const className = "dot-" + escapeCss(name);
+
+    tile.addEventListener("mouseenter", () => {
+      document.querySelectorAll("." + className).forEach(dot => {
+        dot.classList.add("highlight");
+      });
+    });
+
+    tile.addEventListener("mouseleave", () => {
+      document.querySelectorAll("." + className).forEach(dot => {
+        dot.classList.remove("highlight");
+      });
+    });
+  });
+}
+
+plotValuesInBars(); // Balken neu generieren auf Basis sichtbarer Tiles
+addHoverEffectToTiles();
+
+
+  
+  
+  </script>
+  
+  <script>
+    const tour = new Shepherd.Tour({
+      useModalOverlay: true,
+      defaultStepOptions: {
+        scrollTo: true,
+        scrollToHandler: (el) => {
+          const offset = 100; // gewünschter Abstand zum oberen Rand
+          const top = el.getBoundingClientRect().top + window.pageYOffset - offset;
+          window.scrollTo({
+            top,
+            behavior: 'smooth' // optional: animiertes Scrollen
+          });
+        },
+        cancelIcon: {
+          enabled: true
+        },
+        canClickTarget: false,
+        classes: 'shepherd-theme-default',
+        modalOverlayOpeningPadding: 8
+      }
+    });
+
+    tour.addStep({
+      id: 'step-tiles',
+      title: '<strong>So lesen Sie eine Kachel:</strong>',
+      text: `
+        Am oberen Rand der Kachel steht der <em>obere Grenzwert</em>, unten der <em>untere Grenzwert</em>.<br>
+        In der Mitte sehen Sie unter dem <em>Namen</em> Ihren aktuell gemessenen <em>Messwert</em> sowie die dazugehörige <em>Einheit</em>.
+        Also: <br>
+        <br>
+        <em>obere Grenzwert</em><br>
+        <em>Name des Messwerts</em><br>
+        <em>aktueller Messwert</em><br>
+        <em>Einheit</em><br>
+        <em>untere Grenzwert</em>
+      `,
+      attachTo: {
+        element: '.tile', 
+        on: 'bottom' 
+      },
+      buttons: [
+        {
+          text: 'Weiter',
+          action: tour.next
+        }
+      ]
+    });
+
+    tour.addStep({
+      id: 'step-info',
+      title: '<strong>Weitere Informationen:</strong>',
+      text: `
+        <strong>Klicken Sie auf die Kachel</strong>, um weitere Informationen zu diesem Messwert zu erhalten.
+      `,
+      attachTo: {
+        element: '.tile',
+        on: 'top'
+      },
+      buttons: [
+        {
+          text: 'Zurück',
+          action: tour.back
+        },
+        {
+          text: 'Weiter',
+          action: tour.next
+        }
+      ]
+    });
+
+    tour.addStep({
+      id: 'step-zoom',
+      title: '<strong>Zoomkontrolle:</strong>',
+      text: `
+        Mit diesen beiden Schaltflächen können Sie die Dastellung der Messwert-Kacheln vergrößern oder verkleinern.
+      `,
+      attachTo: {
+        element: '.zoom-controls',
+        on: 'bottom'
+      },
+      buttons: [
+        {
+          text: 'Zurück',
+          action: tour.back
+        },
+        {
+          text: 'Weiter',
+          action: tour.next
+        }
+      ]
+    });
+
+    tour.addStep({
+      id: 'step-filter',
+      title: '<strong>Filterfunktion:</strong>',
+      text: `
+        Um nur Kacheln anzeigen zu lassen, die außerhalb des Normalbereichs liegen können Sie diese Schaltfläche anklicken. Um anschließend wieder alle Kacheln sichtbar zu machen, klicken Sie einfach erneut auf diese Schaltfläche.
+      `,
+      attachTo: {
+        element: '.filter-controls',
+        on: 'bottom'
+      },
+      buttons: [
+        {
+          text: 'Zurück',
+          action: tour.back
+        },
+        {
+          text: 'Weiter',
+          action: tour.next
+        }
+      ]
+    });
+    
+    tour.addStep({
+      id: 'step-overview',
+      title: '<strong>Übersicht:</strong>',
+      text: `
+        Die Übersicht soll helfen einen Überblick über alle Werte zu erhalten. Jeder Punkt steht für einen Wert und zeigt durch seine Lage an, ob der zugehörige Wert im Normalbereich liegt oder nicht. 
+      `,
+      attachTo: {
+        element: '.value-bar-container', 
+        on: 'bottom' 
+      },
+      buttons: [
+        {
+          text: 'Zurück',
+          action: tour.back
+        },
+        {
+          text: 'Erklärung  beenden',
+          action: tour.complete
+        }
+        
+      ]
+    });
+
+    // Tour-Start über Button
+    document.getElementById('startTourBtn').addEventListener('click', () => {
+      tour.start();
+    });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laborergebnisse</title>
+  
+  <!-- Roboto Mono von Google Fonts einbinden -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.1.0/dist/chartjs-plugin-annotation.min.js"></script>
+  
+  <!-- Shepherd-Tour CSS & JS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/css/shepherd.css" />
+  <script src="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/js/shepherd.min.js"></script>
+
+
+  <!-- Font Awesome für Navigation -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      padding-bottom: 60px;
+    }
+
+    .content {
+      padding: 10px;
+      text-align: center;
+      padding-bottom: 50px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: normal;
+      margin-bottom: 20px;
+      color: #555;
+    }
+
+    .divider {
+      border: none;
+      border-top: 4px solid #ccc;
+      width: 100%;
+      margin: 0 auto 30px auto;
+    }
+    
+    .dividerSlim {
+      border: none;
+      border-top: 2px solid #ccc;
+      width: 100%;
+      margin: 0 auto 30px auto;
+    }
+    
+    .tile-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      max-width: 1000px;
+      margin: 0 auto;
+      justify-items: center;
+    }
+
+    .tile {
+      position: relative;
+      background-color: #fafafa;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: background-color 0.3s;
+      height: 80px;
+      width: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .tile:hover {
+      background-color: #f1f1f1;
+    }
+
+    .tile .top-value,
+    .tile .bottom-value {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #666;
+    }
+
+    .tile .top-value {
+      top: 5px;
+    }
+
+    .tile .bottom-value {
+      bottom: 5px;
+    }
+
+    .tile .name {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .tile .value {
+      font-size: 20px;
+      margin-bottom: 3px;
+    }
+
+    .tile .unit {
+      font-size: 12px;
+      color: #777;
+    }
+
+    .info-box {
+      display: none;
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 400px;
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .info-box .close-btn {
+      float: right;
+      font-size: 40px;
+      font-weight: bold;
+      color: #666;
+      cursor: pointer;
+    }
+
+    .info-box .close-btn:hover {
+      color: #000;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+      z-index: 999;
+    }
+    
+    #chartOverlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+
+    #chartBox {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 90%;
+      width: 500px;
+      z-index: 1000;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+
+    nav {
+      background-color: #333;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 60px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+    }
+	
+    nav a {
+      display: flex;
+      flex-direction: column; /* Icon über Text */
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      transition: background-color 0.3s, color 0.3s;
+      flex-grow: 1;
+    }
+
+    nav a:hover {
+      background-color: #555;
+    }
+
+    nav a i {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+    
+    nav a span {
+      display: block;
+      font-size: 12px;
+    }
+
+    nav a.active {
+      background-color: #0066cc;
+      color: #fff;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+    }
+
+    .top-nav {
+      display: none;
+      position: sticky;
+      top: 0;
+      width: 100%;
+    }
+
+    .zoom-controls {
+  		margin-bottom: 20px;
+	}
+ 
+	.zoom-controls button {
+      margin: 0 5px;
+      padding: 6px 12px;
+      font-size: 14px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .zoom-controls button:hover {
+      background-color: #004999;
+    }
+    
+    .zoom-controls button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      color: #666;
+      box-shadow: 0 5px 15px rgba(0,0,0,0);
+    }
+    
+    /* Hilfe-Button oben rechts */
+    #startTourBtn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 22px;
+      width: 42px;
+      height: 42px;
+      cursor: pointer;
+      z-index: 9999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      /* Standard: oben rechts (mobile Ansicht) */
+      top: 10px;
+      right: 10px;
+    }
+    #startTourBtn:hover {
+      background-color: #004999;
+    }
+    
+    
+
+    /* Für kleine Kacheln: genau drei Spalten */
+    .tile-grid.tile-small {
+      grid-template-columns: repeat(auto-fit, minmax(80px, 2fr));  /* oder: minmax(0, 1fr) für bessere Flexibilität */
+    }
+
+    /* Für mittlere Kacheln: genau zwei Spalten */
+    .tile-grid.tile-medium {
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    }
+
+    /* Für große Kacheln: genau zwei Spalten */
+    .tile-grid.tile-large {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+	
+    /*Einstellungen für kleine Tiles*/
+    .tile-grid.tile-small .tile {
+      height: 80px;
+      width: 80px;
+    }
+    .tile-grid.tile-small .tile .top-value,
+    .tile-grid.tile-small .tile .bottom-value {
+      font-size: 10px;
+    }
+    .tile-grid.tile-small .tile .top-value {
+      top: 4px;
+    }
+    .tile-grid.tile-small .tile .bottom-value {
+	  bottom: 4px;
+    }
+    .tile-grid.tile-small .tile .name {
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 3px;
+    }
+    .tile-grid.tile-small .tile .value {
+      font-size: 14px;
+      margin-bottom: 1px;
+    }
+    .tile-grid.tile-small .tile .unit {
+      font-size: 10px;
+      color: #777;
+    }
+    .tile-grid.tile-small .scale {
+    height: 12px; 
+    }
+    .tile-grid.tile-small .marker-label {
+    font-size: 10px;
+    }
+    .tile-grid.tile-small .top-label,
+    .tile-grid.tile-small .bottom-label {
+      font-size: 10px;
+      color: #666;
+    }
+	
+	
+    /*Einstellungen für mittlere Tiles*/
+    .tile-grid.tile-medium .tile {
+      height: 110px;
+      width: 110px;
+    }
+    .tile-grid.tile-medium .tile .top-value,
+    .tile-grid.tile-medium .tile .bottom-value {
+      font-size: 12px;
+    }
+    .tile-grid.tile-medium .tile .top-value {
+      top: 4px;
+    }
+    .tile-grid.tile-medium .bottom-value {
+	  bottom: 4px;
+    }
+    .tile-grid.tile-medium .tile .name {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .tile-grid.tile-medium .tile .value {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+    .tile-grid.tile-medium .unit {
+      font-size: 12px;
+      color: #777;
+    }
+    .tile-grid.tile-medium .scale {
+    height: 20px; 
+    }
+    .tile-grid.tile-medium .marker-label {
+    font-size: 12px;
+    }
+    .tile-grid.tile-medium .top-label,
+    .tile-grid.tile-medium .bottom-label {
+      font-size: 12px;
+      color: #666;
+    }
+    
+	
+	/*Einstellungen für größe Tiles*/
+    .tile-grid.tile-large .tile {
+      height: 220px;
+      width: 220px;
+    }
+    .tile-grid.tile-large .tile .top-value,
+    .tile-grid.tile-large .tile .bottom-value {
+      font-size: 20px;
+    }
+    .tile-grid.tile-large .tile .top-value {
+      top: 4px;
+    }
+    .tile-grid.tile-large .bottom-value {
+	  bottom: 4px;
+    }
+    .tile-grid.tile-large .tile .name {
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .tile-grid.tile-large .tile .value {
+      font-size: 30px;
+      margin-bottom: 4px;
+    }
+    .tile-grid.tile-large .unit {
+      font-size: 20px;
+      color: #777;
+    }
+    .tile-grid.tile-large .scale {
+    height: 52px; 
+    }
+    .tile-grid.tile-large .marker-label {
+    font-size: 18px;
+    }
+    .tile-grid.tile-large .top-label,
+    .tile-grid.tile-large .bottom-label {
+      font-size: 18px;
+      color: #666;
+    }
+
+
+    .scale-container {
+      position: relative;
+      flex-grow: 1;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: visible;
+    }
+
+    .scale-container {
+      background: linear-gradient(
+        to top,
+        #ebd1f5 0%,
+        #ebd1f5 33.33%,
+        #fafafa 33.34%,
+        #fafafa 66.66%,
+        #fdded9   66.67%,
+        #fdded9   100%
+      );
+    }
+
+    .scale {
+      position: relative;
+      width: 100%;
+      height: 20px; 
+      /*background: linear-gradient(to top, #dcbddc,#dcbddc, #ffffff,green, #ffffff,#ffe1cd, #ffe1cd);*/
+      border-radius: 0px;
+      overflow: visible;
+    }
+
+    .line-canvas {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 0;
+
+    }
+
+    .line {
+      stroke: #444;
+      stroke-width: 1.5;
+      fill: none;
+    }
+
+    /*Der Punkt für den Wert*/
+    .marker.clipped-top {
+      background-color: #ff978d;
+      border-color: #e9002c;
+    }
+
+    .marker.clipped-bottom {
+      background-color:  #8A00C4;
+      border-color: #44236a ;
+    } 
+
+    .marker {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      border: 1px solid black;
+      z-index: 2;
+      background-color: #ffffff;
+      border-color: #000000;
+      transform: translate(-50%, -50%); /* zentriert den Kreis exakt */
+    }
+
+    .marker.left  { left: 30%;  }
+    .marker.center { left: 50%; }
+    .marker.right { left: 70%; }
+
+    .marker-label {
+      position: absolute;
+      top: 110%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      white-space: nowrap;
+      color: #000;
+    }
+
+    .vertical-range {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      height: 120px;
+      margin: 10px auto;
+      position: relative;
+      
+    }
+
+    .top-label,
+    .bottom-label {
+      font-size: 12px;
+      color: #666;
+    }
+
+@media screen and (min-width: 768px)  {
+        .top-nav {
+          display: flex;
+        }
+
+        .bottom-nav {
+          display: none;
+        }
+
+        body {
+          padding-bottom: 0;
+        }
+
+        .content {
+          padding-top: 40px;
+        }
+
+        nav a {
+          flex-direction: row; /* Icon links vom Text */
+          justify-content: center;
+          font-size: 16px;
+        }
+
+        nav a i {
+          font-size: 20px;
+          margin-bottom: 0;
+          margin-right: 8px;
+          display: inline-block;
+        }
+
+        nav a span {
+          display: inline;
+        }
+        
+        #startTourBtn {
+          top: auto;
+          bottom: 20px;
+          right: 20px;
+        }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Desktop -->
+  <nav class="top-nav">
+    <a href="mydata.html"><i class="fas fa-user"></i> <span>Person</span></a>
+    <a href="overview.html"><i class="fa-solid fa-flask"></i><span>Übersicht</span></a>
+    <a href="timeline.html" class="active"><i class="fas fa-clock"></i> <span>Zeitverlauf</span></a>
+  </nav>
+
+  <!-- Inhalt -->
+  <div class="content">
+  	<!-- Hilfe-Button oben rechts -->
+    <button id="startTourBtn" title="Hilfe anzeigen" class="help-button">
+      <i class="fas fa-question-circle"></i>
+    </button>
+    <h1>Laborergebnisse</h1>
+    <h2>Max Mustermann</h2>
+    
+    
+  <!-- Zoombutton ID-Zuweisung -->
+  <div class="zoom-controls">
+    <button id="zoomOutBtn" onclick="zoomOut()"><i class="fa-solid fa-magnifying-glass-minus"></i> Kleiner</button>
+    <button id="zoomInBtn" onclick="zoomIn()"><i class="fa-solid fa-magnifying-glass-plus"></i> Größer</button>
+  </div>
+    
+    <hr class="divider" />
+
+    <!-- Abschnitt "Kleines Blutbild" -->
+    <h2>Kleines Blutbild</h2>
+    <div class="tile-grid" id="smallBloodGrid"></div>
+    
+    <br>
+	<hr class="dividerSlim" />
+
+    <!-- Abschnitt "Großes Blutbild" -->
+    <h2>Großes Blutbild</h2>
+    <div class="tile-grid" id="largeBloodGrid"></div>
+
+  </div>
+
+  <!-- Navigation Mobile -->
+  <nav class="bottom-nav">
+    <a href="mydata.html"><i class="fas fa-user"></i><span>Person</span></a>
+    <a href="overview.html"><i class="fa-solid fa-flask"></i><span>Übersicht</span></a>
+    <a href="timeline.html" class="active"><i class="fas fa-clock"></i><span>Zeitverlauf</span></a>
+  </nav>
+
+  <!-- Info Box -->
+  <div class="overlay" id="overlay" onclick="closeInfoBox()"></div>
+  <div class="info-box" id="infoBox">
+    <span class="close-btn" onclick="closeInfoBox()">×</span>
+    <h3 id="infoTitle">Zusatzinformationen</h3>
+    <p id="infoText">Details zur Messung erscheinen hier.</p>
+  </div>
+  
+  <div class="overlay" id="chartOverlay" onclick="closeChartOverlay()"></div>
+<div class="info-box" id="chartBox">
+  <span class="close-btn" onclick="closeChartOverlay()">×</span>
+  <h3 id="chartTitle">Messverlauf</h3>
+  <canvas id="chartCanvas" width="400" height="200"></canvas>
+</div>
+
+  
+
+  <!-- Script -->
+  <script>
+
+      
+  const werte = [
+  //kleines Blutbild
+      { name: "Erythrozyten", top: 5.8, valueLeft: 5.8, value: 4.3, valueRight: 4.0, bottom: 4.3, unit: "TPt/l" },
+      { name: "Hämoglobin", top: 10.7, valueLeft: 10.9, value: 8.8, valueRight: 10.9, bottom: 8.4 , unit: "mmol/l" },
+      { name: "Hämatokrit", top: 0.51, valueLeft: 0.44, value: 0.49, valueRight: 0.53, bottom: 0.40 , unit: "l/l" },
+      { name: "MCV", top: 99.0, valueLeft: 81.0, value: 86.8, valueRight: 79.5, bottom: 80.0 , unit: "fl" },
+      { name: "MCH", top: 2.08, valueLeft: 1.70, value: 1.88, valueRight: 1.98, bottom: 1.68 , unit: "fmol" },
+      { name: "MCHC", top: 22.4, valueLeft: 20.1, value: 22.3, valueRight: 21.3, bottom: 19.6 , unit: "mmol/l" },
+      { name: "Leukoyten", top: 10.2, valueLeft: 5.1, value: 5.5, valueRight: 8.5, bottom: 3.9 , unit: "GPt/l" },
+	  { name: "Trombozyten", top: 370, valueLeft: 360, value: 320, valueRight: 80, bottom: 150 , unit: "GPt/l" },
+      
+      //großes Blutbild
+      { name: "Segmentkernige", top: 70, valueLeft: 64, value: 40, valueRight: 66, bottom: 40, unit: "%" },
+      { name: "Stabkernige", top: 10, valueLeft: 4, value: 10, valueRight: 2, bottom: 0 , unit: "%" },
+      { name: "Lymphozyten", top: 44, valueLeft: 25, value: 40, valueRight: 19, bottom: 20, unit: "%" },
+      { name: "Monozyten", top: 10, valueLeft: 3, value: 7, valueRight: 11, bottom: 0 , unit: "%" },
+      { name: "Eosinophile", top: 5, valueLeft: 2, value: 1, valueRight: 1, bottom: 0 , unit: "%" },
+      { name: "Basophile", top: 2, valueLeft: 2, value: 2, valueRight: 1, bottom: 0 , unit: "%" },
+      { name: "Blutsenkung", top: 20, valueLeft: 18, value: 7, valueRight: 10, bottom: 0 , unit: "mm" }
+      
+    ];
+    
+    const smallBloodParameters = ["Erythrozyten", "Hämoglobin", "Hämatokrit", "MCV", "MCH", "MCHC","Leukoyten", "Trombozyten" ];
+	const largeBloodParameters = ["Segmentkernige", "Stabkernige", "Lymphozyten", "Monozyten", "Eosinophile", "Basophile", "Blutsenkung", "HbA1c", "HbA1c (gemäß IFCC)"];
+    
+  
+    function openChartOverlay(name, values, dates, top, bottom) {
+      document.getElementById('chartOverlay').style.display = 'block';
+      document.getElementById('chartBox').style.display = 'block';
+      document.getElementById('chartTitle').innerText = `Verlauf – ${name}`;
+      renderChart(values, dates, top, bottom);
+    }
+
+    function closeChartOverlay() {
+      document.getElementById('chartOverlay').style.display = 'none';
+      document.getElementById('chartBox').style.display = 'none';
+    }
+    
+    let chartInstance = null;
+
+    function renderChart(values, dates, top, bottom) {
+      const ctx = document.getElementById('chartCanvas').getContext('2d');
+
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'Messwert',
+            data: values,
+            borderColor: '#999',
+            backgroundColor: 'rgba(0,102,204,0.1)',
+            fill: false,
+            tension: 0.2,
+            pointRadius: 4,
+            pointBackgroundColor: '#000000',
+            pointBorderColor: '#000000'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              title: { display: true, text: 'Datum' },
+              ticks: { maxRotation: 45, minRotation: 0 }
+            },
+            y: {
+              beginAtZero: false,
+              min: Math.min(...values, bottom) - 0.2 * (top - bottom),
+              max: Math.max(...values, top) + 0.2 * (top - bottom),
+              title: {
+                display: true,
+                text: 'Wert'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            annotation: {
+              annotations: {
+                tooLow: {
+                  type: 'box',
+                  yMin: Number.NEGATIVE_INFINITY,
+                  yMax: bottom,
+                  backgroundColor: 'rgba(146, 86, 196, 0.2)', // lila
+                  borderWidth: 0
+                },
+                tooHigh: {
+                  type: 'box',
+                  yMin: top,
+                  yMax: Number.POSITIVE_INFINITY,
+                  backgroundColor: 'rgba(255, 151, 141, 0.2)', // orange
+                  borderWidth: 0
+                }
+              }
+            }
+          }
+        },
+        plugins: [Chart.registry.getPlugin('annotation')]
+      });
+    }
+
+
+
+    function closeInfoBox() {
+      document.getElementById('infoBox').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    }
+    
+    let zoomLevels = ['tile-small', 'tile-medium', 'tile-large'];
+    let currentZoomIndex = 1; // Start bei medium
+
+    function applyZoom() {
+      const grids = [document.getElementById("smallBloodGrid"), document.getElementById("largeBloodGrid")];
+
+      grids.forEach(grid => {
+        grid.classList.remove(...zoomLevels);
+        grid.classList.add(zoomLevels[currentZoomIndex]);
+      });
+
+      updateZoomButtons();
+    }
+
+    function zoomIn() {
+      if (currentZoomIndex < zoomLevels.length - 1) {
+        currentZoomIndex++;
+        applyZoom();
+         renderTiles(); // neu rendern!
+      }
+    }
+
+    function zoomOut() {
+      if (currentZoomIndex > 0) {
+        currentZoomIndex--;
+        applyZoom();
+         renderTiles(); // neu rendern!
+      }
+    }
+
+    function updateZoomButtons() {
+      const zoomOutBtn = document.getElementById('zoomOutBtn');
+      const zoomInBtn = document.getElementById('zoomInBtn');
+
+      zoomOutBtn.disabled = currentZoomIndex === 0;
+      zoomInBtn.disabled = currentZoomIndex === zoomLevels.length - 1;
+      
+        // Zoom Out: deaktivieren & Tooltip setzen
+      if (currentZoomIndex === 0) {
+        zoomOutBtn.disabled = true;
+        zoomOutBtn.title = "Minimaler Zoom erreicht";
+      } else {
+        zoomOutBtn.disabled = false;
+        zoomOutBtn.title = "Kleiner anzeigen";
+      }
+
+      // Zoom In: deaktivieren & Tooltip setzen
+      if (currentZoomIndex === zoomLevels.length - 1) {
+        zoomInBtn.disabled = true;
+        zoomInBtn.title = "Maximaler Zoom erreicht";
+      } else {
+        zoomInBtn.disabled = false;
+        zoomInBtn.title = "Größer anzeigen";
+      }
+    }
+    
+
+
+    // Navigation aktiv setzen
+    const navLinks = document.querySelectorAll('.top-nav a, .bottom-nav a');
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.forEach(el => el.classList.remove('active'));
+        link.classList.add('active');
+      });
+    });
+    
+    
+    /**/
+    
+    function renderTiles() {
+  const smallGrid = document.getElementById("smallBloodGrid");
+  const largeGrid = document.getElementById("largeBloodGrid");
+
+  smallGrid.innerHTML = "";
+  largeGrid.innerHTML = "";
+
+  const tileSizeConfig = {
+    "tile-small": { scaleHeight: 12, capOverflow: 6, markerRadius: 3 },
+    "tile-medium": { scaleHeight: 20, capOverflow: 10, markerRadius: 5 },
+    "tile-large": { scaleHeight: 52, capOverflow: 30, markerRadius: 6 }
+  };
+
+  function getCurrentTileSizeConfig() {
+    const matched = Object.keys(tileSizeConfig).find(t => smallGrid.classList.contains(t));
+    return tileSizeConfig[matched] || tileSizeConfig["tile-medium"];
+  }
+
+  const { scaleHeight: scaleHeightPx, capOverflow: capOverflowPx, markerRadius } = getCurrentTileSizeConfig();
+  const totalScaleHeightPx = scaleHeightPx + 2 * capOverflowPx;
+
+  werte.forEach(el => {
+    const range = el.top - el.bottom;
+
+    const original = {
+      left: el.valueLeft,
+      center: el.value,
+      right: el.valueRight
+    };
+
+    function valueToY(val) {
+      const relative = (el.top - val) / range;
+      return relative * scaleHeightPx;
+    }
+
+    function applyCappedY(y) {
+      return Math.min(scaleHeightPx + capOverflowPx, Math.max(-capOverflowPx, y));
+    }
+
+    const yValue = {
+      left: valueToY(original.left),
+      center: valueToY(original.center),
+      right: valueToY(original.right)
+    };
+
+    const yCapped = {
+      left: applyCappedY(yValue.left),
+      center: applyCappedY(yValue.center),
+      right: applyCappedY(yValue.right)
+    };
+
+    const clipClass = val => {
+      if (val < el.bottom) return "clipped-bottom";
+      if (val > el.top) return "clipped-top";
+      return "";
+    };
+
+    const tile = document.createElement("div");
+    tile.className = "tile";
+
+    //---------------
+    const chartValues = [
+      ...Array.from({ length: 5 }, () => Math.random() * (el.top - el.bottom) + el.bottom),
+      original.left,
+      original.center,
+      original.right
+    ];
+
+    const chartDates = Array.from({ length: chartValues.length }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (chartValues.length - 1 - i));
+      return date.toLocaleDateString();
+    });
+    //---------------
+
+    tile.innerHTML = `
+      <div class="name">${el.name}</div>
+      <div class="top-label">${el.top} ${el.unit}</div>
+      <div class="scale-container">
+        <div class="scale">
+
+          <svg class="line-canvas"
+            style="top: -${capOverflowPx}px; height: ${totalScaleHeightPx}px;"
+            width="100%" height="${totalScaleHeightPx}"
+            viewBox="0 0 100 ${totalScaleHeightPx}"
+            preserveAspectRatio="none">
+            <line x1="30" y1="${yCapped.left+capOverflowPx}" x2="50" y2="${yCapped.center+capOverflowPx}" class="line"/>
+            <line x1="50" y1="${yCapped.center+capOverflowPx}" x2="70" y2="${yCapped.right+capOverflowPx}" class="line"/>
+          </svg>
+
+          <div class="marker left ${clipClass(original.left)}"
+            style="top: ${yCapped.left}px; left: 30%; width: ${markerRadius}px; height: ${markerRadius}px;">
+            <div class="marker-label">${original.left}</div>
+          </div>
+
+          <div class="marker center ${clipClass(original.center)}"
+            style="top: ${yCapped.center}px; left: 50%; width: ${markerRadius}px; height: ${markerRadius}px;">
+            <div class="marker-label">${original.center}</div>
+          </div>
+
+          <div class="marker right ${clipClass(original.right)}"
+            style="top: ${yCapped.right}px; left: 70%; width: ${markerRadius}px; height: ${markerRadius}px;">
+            <div class="marker-label">${original.right}</div>
+          </div>
+
+        </div>
+      </div>
+      <div class="bottom-label">${el.bottom} ${el.unit}</div>
+    `;
+
+    tile.addEventListener("click", () => {
+      openChartOverlay(el.name, chartValues, chartDates, el.top, el.bottom);
+    });
+
+    // Zu "kleines Blutbild" oder "großes Blutbild" zuordnen
+    if (smallBloodParameters.includes(el.name)) {
+      smallGrid.appendChild(tile);
+    } else {
+      largeGrid.appendChild(tile);
+    }
+  });
+}
+
+applyZoom();
+renderTiles();  // initiale Kachel-Erzeugung
+  
+    
+  </script>
+  
+  <script>
+  const tour = new Shepherd.Tour({
+      useModalOverlay: true,
+      defaultStepOptions: {
+        scrollTo: true,
+        scrollToHandler: (el) => {
+          const offset = 100; // gewünschter Abstand zum oberen Rand
+          const top = el.getBoundingClientRect().top + window.pageYOffset - offset;
+          window.scrollTo({
+            top,
+            behavior: 'smooth' // optional: animiertes Scrollen
+          });
+        },
+        cancelIcon: {
+          enabled: true
+        },
+        canClickTarget: false,
+        classes: 'shepherd-theme-default',
+        modalOverlayOpeningPadding: 8
+      }
+    });
+
+  // Schritt 1: Kachelstruktur erklären
+  tour.addStep({
+    id: 'step-tiles',
+    title: '<strong>Wie lesen Sie eine Kachel?</strong>',
+    text: `
+      Nach dem Namen des Messwerts sehen Sie ganz oben die <em>obere Grenze</em> des Normalbereichs. Ganz unten sehen Sie die <em>untere Grenze</em> des Normalbereichs. <br>
+      <br>
+      <em>Punkt im weißen Bereich = Normal </em><br>
+      <em>Punkt im orangen Bereich = zu hoch </em><br>
+      <em>Punkt im lila Bereich = zu niedrig </em>
+    `,
+    attachTo: {
+      element: '.tile',
+      on: 'bottom'
+    },
+    buttons: [
+      {
+        text: 'Weiter',
+        action: tour.next
+      }
+    ]
+  });
+
+  // Schritt 2: Interaktivität
+  tour.addStep({
+    id: 'step-click',
+    title: '<strong>Tipp!</strong>',
+    text: `
+      Klicken Sie auf die Kacheln, um den <strong>ganzen Verlauf</strong> anzeigen zu lassen.
+    `,
+    attachTo: {
+      element: '.tile',
+      on: 'top'
+    },
+    buttons: [
+      {
+        text: 'Zurück',
+        action: tour.back
+      },
+      {
+        text: 'Weiter',
+        action: tour.next
+      }
+    ]
+  });
+
+  // Schritt 3: Zoomfunktion
+  tour.addStep({
+    id: 'step-zoom',
+    title: '<strong>Zoomfunktion:</strong>',
+    text: `
+       Mit diesen beiden Schaltflächen können Sie die Dastellung der Messwert-Kacheln vergrößern oder verkleinern.
+    `,
+    attachTo: {
+      element: '.zoom-controls',
+      on: 'top'
+    },
+    buttons: [
+      {
+        text: 'Zurück',
+        action: tour.back
+      },
+      {
+        text: 'Erklärung beenden',
+        action: tour.complete
+      }
+    ]
+  });
+
+  // Eventlistener für Startknopf
+  document.getElementById("startTourBtn").addEventListener("click", function () {
+    tour.start();
+  });
+</script>
+  
+</body>
+</html>

@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laborergebnisse</title>
+  
+  <!-- Roboto Mono von Google Fonts einbinden -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+
+  <!-- Shepherd-Tour CSS & JS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/css/shepherd.css" />
+  <script src="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/js/shepherd.min.js"></script>
+
+  <!-- Font Awesome für Navigation -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      padding-bottom: 60px;
+      transition: font-size 0.3s ease;
+    }
+    
+    body.font-small {
+      font-size: 85%;
+    }
+
+    body.font-medium {
+      font-size: 100%;
+    }
+
+    body.font-large {
+      font-size: 130%;
+    }
+    
+
+    .content {
+      padding: 10px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: normal;
+      margin-bottom: 20px;
+      color: #555;
+    }
+
+    .divider {
+      border: none;
+      border-top: 4px solid #ccc;
+      width: 100%;
+      margin: 0 auto 30px auto;
+    }
+
+    
+    .info-box {
+      display: none;
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 400px;
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .info-box .close-btn {
+      float: right;
+      font-size: 40px;
+      font-weight: bold;
+      color: #666;
+      cursor: pointer;
+    }
+
+    .info-box .close-btn:hover {
+      color: #000;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+      z-index: 999;
+    }
+
+    nav {
+      background-color: #333;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 60px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+    }
+	
+    nav a {
+      display: flex;
+      flex-direction: column; /* Icon über Text */
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      transition: background-color 0.3s, color 0.3s;
+      flex-grow: 1;
+    }
+
+    nav a:hover {
+      background-color: #555;
+    }
+
+    nav a i {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+    
+    nav a span {
+      display: block;
+      font-size: 12px;
+    }
+
+    nav a.active {
+      background-color: #0066cc;
+      color: #fff;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+    }
+
+    .top-nav {
+      display: none;
+      position: sticky;
+      top: 0;
+      width: 100%;
+    }
+    
+    .data-table {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 10px;
+      padding-bottom: 50px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+
+    .label {
+      flex: 1 1 40%;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .value {
+      flex: 1 1 60%;
+      color: #444;
+      text-align: right;
+    }
+    
+    .collapsible {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .older-toggle-container {
+      text-align: center;
+      margin: 15px 0;
+    }
+
+    .toggle-label {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 5px;
+    }
+
+    .arrow {
+      font-size: 18px;
+      color: #007acc;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .arrow.rotate i {
+      transform: rotate(180deg);
+    }
+        
+    .zoom-controls {
+  		margin-bottom: 20px;
+	}
+   
+	.zoom-controls button {
+      margin: 0 5px;
+      padding: 6px 12px;
+      font-size: 14px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .zoom-controls button:hover {
+      background-color: #004999;
+    }
+    
+     .zoom-controls button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      color: #666;
+      box-shadow: 0 5px 15px rgba(0,0,0,0);
+    }
+    
+    /* Hilfe-Button oben rechts */
+    #startTourBtn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 22px;
+      width: 42px;
+      height: 42px;
+      cursor: pointer;
+      z-index: 9999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      /* Standard: oben rechts (mobile Ansicht) */
+      top: 10px;
+      right: 10px;
+    }
+    #startTourBtn:hover {
+      background-color: #004999;
+    }
+    
+    @media screen and (min-width: 768px)  {
+      .top-nav {
+        display: flex;
+      }
+
+      .bottom-nav {
+        display: none;
+      }
+
+      body {
+        padding-bottom: 0;
+      }
+
+      .content {
+        padding-top: 40px;
+      }
+
+      .label {
+        flex: 1 1 100%;
+        text-align: left;
+      }
+
+      .value {
+        flex: 1 1 100%;
+        text-align: right; /* Rechtsbündig auch auf kleinem Display */
+      }
+      
+      
+      nav a {
+        flex-direction: row; /* Icon links vom Text */
+        justify-content: center;
+        font-size: 16px;
+      }
+
+      nav a i {
+        font-size: 20px;
+        margin-bottom: 0;
+        margin-right: 8px;
+        display: inline-block;
+      }
+
+      nav a span {
+        display: inline;
+      }
+      
+       #startTourBtn {
+    top: auto;
+    bottom: 20px;
+    right: 20px;
+  }
+    }
+
+
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Desktop -->
+  <nav class="top-nav">
+    <a href="mydata.html" class="active"><i class="fas fa-user"></i> <span>Person</span></a>
+    <a href="overview.html"><i class="fa-solid fa-flask"></i><span>Übersicht</span></a>
+    <a href="timeline.html"><i class="fas fa-clock"></i> <span>Zeitverlauf</span></a>
+  </nav>
+
+  <!-- Inhalt -->
+  <div class="content">
+  <!-- Hilfe-Button oben rechts -->
+<button id="startTourBtn" title="Darstellung erklären" class="help-button">
+  <i class="fas fa-question-circle"></i>
+</button>
+    <h1>Persönliche Daten</h1>
+    <h2>Max Mustermann</h2>
+    
+  <!-- Zoombutton ID-Zuweisung -->
+  <div class="zoom-controls">
+    <button id="zoomOutBtn" onclick="zoomOut()"><i class="fa-solid fa-magnifying-glass-minus"></i> Kleiner</button>
+    <button id="zoomInBtn" onclick="zoomIn()"><i class="fa-solid fa-magnifying-glass-plus"></i> Größer</button>
+  </div>
+    
+    <hr class="divider" />
+  </div>
+  
+  <div class="data-table">
+  <div class="row">
+    <div class="label">Name:</div>
+    <div class="value">Max Mustermann</div>
+  </div>
+  <div class="row">
+    <div class="label">Geboren:</div>
+    <div class="value">02.05.2001</div>
+  </div>
+  <div class="row">
+    <div class="label">Geschlecht:</div>
+    <div class="value">männlich</div>
+  </div>
+  <div class="row">
+    <div class="label">Labornummer:</div>
+    <div class="value">12345678</div>
+  </div>
+  <div class="row">
+    <div class="label">Externe Nr.:</div>
+    <div class="value">-</div>
+  </div>
+  <div class="row">
+    <div class="label">Aktuellster Befund (Befundung):</div>
+    <div class="value">12.10.2025</div>
+  </div>
+  <div class="row">
+    <div class="label">Aktuellster Befund (Eingang):</div>
+    <div class="value">12.10.2025</div>
+  </div>
+  <div class="row">
+    <div class="label">Aktuellster Befund (Abnahme):</div>
+    <div class="value">12.10.2025</div>
+  </div>
+  <div class="row">
+    <div class="label">Aktuellster Befund (Material):</div>
+    <div class="value">Blut</div>
+  </div>
+  <!-- Ausklappbarer Bereich -->
+  <div class="older-toggle-container">
+    <div class="toggle-label">ältere Befunde</div>
+    <div id="toggleArrow" class="arrow" onclick="toggleOlderReports()">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+  </div>
+
+  <div id="olderReports" class="collapsible">
+    <div class="row">
+      <div class="label">Befund vom 01.09.2025:</div>
+      <div class="value">Blut</div>
+    </div>
+    <div class="row">
+      <div class="label">Befund vom 15.07.2025:</div>
+      <div class="value">Blut</div>
+    </div>
+  </div>
+
+  
+  
+</div>
+
+
+  <!-- Navigation Mobile -->
+  <nav class="bottom-nav">
+    <a href="mydata.html" class="active"><i class="fas fa-user"></i><span>Person</span></a>
+    <a href="overview.html"><i class="fa-solid fa-flask"></i><span>Übersicht</span></a>
+    <a href="timeline.html"><i class="fas fa-clock"></i><span>Zeitverlauf</span></a>
+  </nav>
+
+  <!-- Info Box -->
+  <div class="overlay" id="overlay" onclick="closeInfoBox()"></div>
+  <div class="info-box" id="infoBox">
+    <span class="close-btn" onclick="closeInfoBox()">×</span>
+    <h3 id="infoTitle">Zusatzinformationen</h3>
+    <p id="infoText">Details zur Messung erscheinen hier.</p>
+  </div>
+  
+  
+
+  <!-- Script -->
+  <script>
+    function openInfoBox(name) {
+      document.getElementById('infoBox').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+      document.getElementById('infoTitle').innerText = name;
+      document.getElementById('infoText').innerText = `Weitere Informationen zu ${name} folgen hier.`;
+    }
+
+    function closeInfoBox() {
+      document.getElementById('infoBox').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    }
+    
+   let fontSizes = ['font-small', 'font-medium', 'font-large'];
+   let currentFontIndex = 1; // Start mit 'font-medium'
+
+    function applyFontSize() {
+      const bodyEl = document.body;
+      // Alle möglichen Klassen entfernen
+      bodyEl.classList.remove(...fontSizes);
+      // Aktuelle Klasse hinzufügen
+      bodyEl.classList.add(fontSizes[currentFontIndex]);
+      updateZoomButtons();
+    }
+
+    function zoomIn() {
+      if (currentFontIndex < fontSizes.length - 1) {
+        currentFontIndex++;
+        applyFontSize();
+      }
+    }
+
+    function zoomOut() {
+      if (currentFontIndex > 0) {
+        currentFontIndex--;
+        applyFontSize();
+      }
+    }
+
+    function updateZoomButtons() {
+      const zoomOutBtn = document.getElementById('zoomOutBtn');
+      const zoomInBtn = document.getElementById('zoomInBtn');
+
+      zoomOutBtn.disabled = currentFontIndex === 0;
+      zoomInBtn.disabled = currentFontIndex === fontSizes.length - 1;
+
+      zoomOutBtn.title = currentFontIndex === 0
+        ? "Minimaler Zoom erreicht"
+        : "Kleiner anzeigen";
+
+      zoomInBtn.title = currentFontIndex === fontSizes.length - 1
+        ? "Maximaler Zoom erreicht"
+        : "Größer anzeigen";
+    }
+
+    function updateZoomButtons() {
+  const zoomOutBtn = document.getElementById('zoomOutBtn');
+  const zoomInBtn = document.getElementById('zoomInBtn');
+
+  zoomOutBtn.disabled = currentFontIndex === 0;
+  zoomInBtn.disabled = currentFontIndex === fontSizes.length - 1;
+
+  zoomOutBtn.title = currentFontIndex === 0
+    ? "Minimaler Zoom erreicht"
+    : "Kleiner anzeigen";
+
+  zoomInBtn.title = currentFontIndex === fontSizes.length - 1
+    ? "Maximaler Zoom erreicht"
+    : "Größer anzeigen";
+}
+    
+
+    // Initial anwenden
+    applyZoom();
+    applyFontSize();
+
+    
+    function toggleOlderReports() {
+      const section = document.getElementById("olderReports");
+      const arrow = document.getElementById("toggleArrow");
+
+      const isVisible = section.style.display === "block";
+
+      section.style.display = isVisible ? "none" : "block";
+      arrow.classList.toggle("rotate", !isVisible);
+    }
+
+
+    
+  </script>
+  
+  <script>
+  const tour = new Shepherd.Tour({
+      useModalOverlay: true,
+      defaultStepOptions: {
+        scrollTo: true,
+        scrollToHandler: (el) => {
+          const offset = 100; // gewünschter Abstand zum oberen Rand
+          const top = el.getBoundingClientRect().top + window.pageYOffset - offset;
+          window.scrollTo({
+            top,
+            behavior: 'smooth' // optional: animiertes Scrollen
+          });
+        },
+        cancelIcon: {
+          enabled: true
+        },
+        canClickTarget: false,
+        classes: 'shepherd-theme-default',
+        modalOverlayOpeningPadding: 8
+      }
+    });
+
+  // Schritt 1: Datenbereich
+  tour.addStep({
+    id: 'step-data',
+    title: '<strong>Datenübersicht:</strong>',
+    text: 'Hier finden Sie ihre persönlichen Daten und organisatorische Informationen zu Ihrem aktuellen Laborbefund.',
+    attachTo: {
+      element: '.data-table',
+      on: 'top'
+    },
+    buttons: [
+      {
+        text: 'Weiter',
+        action: tour.next
+      }
+    ]
+  });
+
+  // Schritt 2: Zoomfunktion
+  tour.addStep({
+    id: 'step-zoom',
+    title: '<strong>Zoomfunktion:</strong>',
+    text: 'Mit diesen beiden Schaltflächen können Sie die Dastellung der Messwert-Kacheln vergrößern oder verkleinern.',
+    attachTo: {
+      element: '.zoom-controls',
+      on: 'bottom'
+    },
+    buttons: [
+      {
+        text: 'Zurück',
+        action: tour.back
+      },
+      {
+        text: 'Weiter',
+        action: tour.next
+      }
+    ]
+  });
+
+  // Schritt 3: frühere Befunde
+  tour.addStep({
+    id: 'step-toggle',
+    title: '<strong>Ältere Befunde:</strong>',
+    text: 'Hier können Sie frühere Laborbefunde ein- oder ausklappen und einsehen, wann diese durchgeführt wurden.',
+    attachTo: {
+      element: '#toggleArrow',
+      on: 'top'
+    },
+    buttons: [
+      {
+        text: 'Zurück',
+        action: tour.back
+      },
+      {
+        text: 'Erklärung beenden',
+        action: tour.complete
+      }
+    ]
+  });
+
+  // Event-Listener für Start-Button
+  document.getElementById("startTourBtn").addEventListener("click", function () {
+    tour.start();
+  });
+</script>
+
+
+</body>
+</html>

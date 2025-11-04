@@ -663,7 +663,7 @@
       { name: "MCH", top: 2.08, valueLeft: 1.70, value: 1.88, valueRight: 1.98, bottom: 1.68 , unit: "fmol" },
       { name: "MCHC", top: 22.4, valueLeft: 20.1, value: 22.3, valueRight: 21.3, bottom: 19.6 , unit: "mmol/l" },
       { name: "Leukoyten", top: 10.2, valueLeft: 5.1, value: 5.5, valueRight: 8.5, bottom: 3.9 , unit: "GPt/l" },
-	  { name: "Trombozyten", top: 370, valueLeft: 360, value: 320, valueRight: 80, bottom: 150 , unit: "GPt/l" },
+	  { name: "Thrombozyten", top: 370, valueLeft: 360, value: 320, valueRight: 80, bottom: 150 , unit: "GPt/l" },
       
       //großes Blutbild
       { name: "Segmentkernige", top: 70, valueLeft: 64, value: 40, valueRight: 66, bottom: 40, unit: "%" },
@@ -676,8 +676,8 @@
       
     ];
     
-    const smallBloodParameters = ["Erythrozyten", "Hämoglobin", "Hämatokrit", "MCV", "MCH", "MCHC","Leukoyten", "Trombozyten" ];
-	const largeBloodParameters = ["Segmentkernige", "Stabkernige", "Lymphozyten", "Monozyten", "Eosinophile", "Basophile", "Blutsenkung", "HbA1c", "HbA1c (gemäß IFCC)"];
+    const smallBloodParameters = ["Erythrozyten", "Hämoglobin", "Hämatokrit", "MCV", "MCH", "MCHC","Leukoyten", "Thrombozyten" ];
+	const largeBloodParameters = ["Segmentkernige", "Stabkernige", "Lymphozyten", "Monozyten", "Eosinophile", "Basophile", "Blutsenkung"];
     
   
     function openChartOverlay(name, values, dates, top, bottom) {
@@ -1068,3 +1068,4 @@ renderTiles();  // initiale Kachel-Erzeugung
 </body>
 
 </html>
+
